@@ -1,0 +1,18 @@
+
+.fastdev.lock
+build.log
+build/
+
+# Build directories #
+#####################
+tmp
+build/android/
+build/iphone/
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
