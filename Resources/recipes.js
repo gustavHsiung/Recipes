@@ -10,13 +10,38 @@ var data = [];
 //declare the ht tp cl ient object
 var recipesHTTPClient = Titanium.Network.createHTTPClient();
 
+//define search bar which will attach to  table view
+var searchBar = Titanium.UI.createSearchBar({
+	showCancel:true,
+	height :43,
+	top:0
+});
+
+//print out the searchbar value whenever it changes 
+searchBar.addEventListener('change' , function(e){
+	
+	Ti.API.info('user searching for: ' + e.value);
+});
+//when the return key is hit, make searchBar get blur
+searchBar.addEventListener('return' , function(e){
+	searchBar.blur(); 
+});
+
+//when the cancel but ton is tapped,make searchBar get blur too
+searchBar.addEventListener('cancel', function(e){
+	searchBar.blur();
+});
+//end of search bar
+
+
 //create a table view
 var recipesTable = Titanium.UI.createTableView({
 	height: 366,
 	width: 	320,
 	top: 	0,
 	left: 	0,
-	backgroundColor: ""
+	search: searchBar,
+	filterAttribute:'filter'
 }); 
 win.add(recipesTable);
 
@@ -45,6 +70,7 @@ recipesHTTPClient.onload = function() {
 		var row = Titanium.UI.createTableViewRow({
 			hasChild: true,
 			className: 'recipe-row',
+			filter: title,
 			height:'auto'
 		});
 		//title label for row at index i
