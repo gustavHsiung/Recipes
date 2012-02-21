@@ -47,73 +47,58 @@ win.add(recipesTable);
 
 // this method will process the remote data 
 recipesHTTPClient.onload = function() {
-	//var xml = this.responseXML.documentElement//this.responseXML;
-	//var doc = this.responseXML.documentElement;
-	var doc = this.responseXML.documentElement;
 	
-	//get item node list
-	var channel = doc.getElementsByTagName("channel").item(0);
-	var items = channel.getElementsByTagName("item");
+	//create a json object using the JSON.PARSE function
+	
+	var jsonObject = JSON.parse(this.responseText);
+	
 	//get through each item 
-	for(var i = 0; i < items.length; i++)
+	for(var i = 0; i < jsonObject.query.results.entry.length; i++)
 	{
-		var content = items.item(i);
-		var title = content.getElementsByTagName("title").item(0).text;
-		
-		// test
-		var descriptionTag = content.getElementsByTagName("description").item(0).text;
-		Ti.API.info(descriptionTag);
-	
-		var description = content.getElementsByTagName("description").item(0).text;
+		var aFeed = jsonObject.query.results.entry[i];
 		
 		//create table row
 		var row = Titanium.UI.createTableViewRow({
 			hasChild: true,
 			className: 'recipe-row',
-			filter: title,
-			height:'auto'
+			filter: aFeed.title.content,
+			height:'auto',
+			backgroundColor: '#fff'
 		});
 		//title label for row at index i
 		var titleLabel = Titanium.UI.createLabel({
-			text: title,
+			text: aFeed.title.content,
 			font : {fontSize: 14, fontWeight : ' bold' },
 			left: 70,
 			top: 5,
 			height: 20,
-			width: 210
+			width: 210,
+			color:'#232'
 		});
 		
 		row.add(titleLabel);
 		
 		//description view for row at index i
-		
-		
-		if(description.length == 0) {
-			var descriptionLabel = Titanium.UI.createLabel({
+		var descriptionLabel = Titanium.UI.createLabel({
 				font : {fontSize: 10, fontWeight : ' normal ' },
-				left: 70,
-				top: 25,
-				height: 40,
-				width: 200
-			});
+				left: 	70,
+				top: 	titleLabel.height+5,
+				width: 	200,
+				color:	'#9c9'
+		});
+		
+		if(aFeed.content.content.length == 0) {
+			
 			descriptionLabel.text = 'No description is available.'; 
-			row.add(descriptionLabel);
-		
+			descriptionLabel.height = 20;
+				
 		}else{
-			var xhtml = '<html><body width="100%" height="100%"><h3>'+ title +'</h3>' +description+ '</body></html>';
-			var rowWeb = Ti.UI.createWebView({
-				html: xhtml,
-				scalesPageToFit: true,
-				touchEnabled: false,
-				top:25,
-				left:70,
-				width: 200,
-				height: (description.length < 475)? 100 : 150,
-				backgroundColor: 'transparent'
-			});
-		
-			row.add(rowWeb);		
+			descriptionLabel.text = aFeed.content.content;
+			descriptionLabel.height = 45;
+					
 		}
+		row.add(descriptionLabel);
+		row.height = titleLabel.height + descriptionLabel.height +15;
 		//add our little icon to the left of the row 
 		var iconImage = Titanium.UI.createImageView({
 			image: 'img/eggpan.png',
@@ -123,7 +108,6 @@ recipesHTTPClient.onload = function() {
 			top: 10 
 		});
 		row.add(iconImage);
-		
 		//add the row to data array
 		data.push(row);
 	}
@@ -137,9 +121,13 @@ recipesHTTPClient.onerror = function() {
 	Ti.API.error(this.status + ' - ' + this.statusText);
 }
 ;
-//open the recipes xml feed
-recipesHTTPClient.open('GET' , 'http://rss.allrecipes.com/daily.aspx?hubID=80');//'http://tw.news.yahoo.com/rss/sports');//'http://vimeo.com/api/docs/simple-api');
 
+Ti.API.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>open");
+	
+//open the recipes xml feed
+recipesHTTPClient.open('GET' , 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20feed%20where%20url%3D\'http%3A%2F%2Fwww.foodandwine.com%2Ffeeds%2Flatest_recipes%3Fformat%3Datom\'&format=json&diagnostics=true');
+//'http://rss.allrecipes.com/daily.aspx?hubID=80');
+//'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20feed%20where%20url%3D\'http%3A%2F%2Frss.allrecipes.com%2Fdaily.aspx%3FhubID%3D80\'&format=json&diagnostics=true&callback=cbfunc');//
 //execute the call to the remote feed 
 recipesHTTPClient.send();
 
