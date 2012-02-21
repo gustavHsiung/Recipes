@@ -22,16 +22,23 @@ win.add(recipesTable);
 // this method will process the remote data 
 recipesHTTPClient.onload = function() {
 	Ti.API.info(this.responseText);
-	var xml = this.responseXML;
-	//get item node list
-	var items = xml.documentElement.getElementsByTagName("item");
+	//var xml = this.responseXML.documentElement//this.responseXML;
+	//var doc = this.responseXML.documentElement;
+	var doc = this.responseXML.documentElement;
 	
+	//get item node list
+	var channel = doc.getElementsByTagName("channel").item(0);
+	var items = channel.getElementsByTagName("item");
 	//get through each item 
 	for(var i = 0; i < items.length; i++)
 	{
+		var content = items.item(i);
+		var title = content.getElementsByTagName("title").item(0).text;
+		Ti.API.info(title);
+	
 		//create table row
 		var row = Titanium.UI.createTableViewRow({
-			title: items.item(i).getElementsByTagName("Title").item(0).text
+			title: title
 		});
 		//add the row to data array
 		data.push(row);
@@ -47,7 +54,7 @@ recipesHTTPClient.onerror = function() {
 }
 ;
 //open the recipes xml feed
-recipesHTTPClient.open('GET' , 'http://www.cuisine.com.au/feed/all-recipes');
+recipesHTTPClient.open('GET' , 'http://rss.allrecipes.com/daily.aspx?hubID=80');//'http://tw.news.yahoo.com/rss/sports');//'http://vimeo.com/api/docs/simple-api');
 
 //execute the call to the remote feed 
 recipesHTTPClient.send();
