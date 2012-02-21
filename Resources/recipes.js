@@ -15,13 +15,13 @@ var recipesTable = Titanium.UI.createTableView({
 	height: 366,
 	width: 	320,
 	top: 	0,
-	left: 	0
+	left: 	0,
+	backgroundColor: ""
 }); 
 win.add(recipesTable);
 
 // this method will process the remote data 
 recipesHTTPClient.onload = function() {
-	Ti.API.info(this.responseText);
 	//var xml = this.responseXML.documentElement//this.responseXML;
 	//var doc = this.responseXML.documentElement;
 	var doc = this.responseXML.documentElement;
@@ -34,10 +34,13 @@ recipesHTTPClient.onload = function() {
 	{
 		var content = items.item(i);
 		var title = content.getElementsByTagName("title").item(0).text;
+		
+		// test
+		var descriptionTag = content.getElementsByTagName("description").item(0).text;
+		Ti.API.info(descriptionTag);
+	
 		var description = content.getElementsByTagName("description").item(0).text;
 		
-		Ti.API.info(title);
-	
 		//create table row
 		var row = Titanium.UI.createTableViewRow({
 			hasChild: true,
@@ -56,21 +59,35 @@ recipesHTTPClient.onload = function() {
 		
 		row.add(titleLabel);
 		
-		//description label for row at index i
-		var descriptionLabel = Titanium.UI.createLabel({
-			font : {fontSize: 10, fontWeight : ' normal ' },
-			left: 70,
-			top: 25,
-			height: 40,
-			width: 200
-		});
+		//description view for row at index i
 		
-		if(descriptionLabel.text == '') {
+		
+		if(description.length == 0) {
+			var descriptionLabel = Titanium.UI.createLabel({
+				font : {fontSize: 10, fontWeight : ' normal ' },
+				left: 70,
+				top: 25,
+				height: 40,
+				width: 200
+			});
 			descriptionLabel.text = 'No description is available.'; 
+			row.add(descriptionLabel);
+		
 		}else{
-			descriptionLabel.text = description;			
+			var xhtml = '<html><body width="100%" height="100%"><h3>'+ title +'</h3>' +description+ '</body></html>';
+			var rowWeb = Ti.UI.createWebView({
+				html: xhtml,
+				scalesPageToFit: true,
+				touchEnabled: false,
+				top:25,
+				left:70,
+				width: 200,
+				height: (description.length < 475)? 100 : 150,
+				backgroundColor: 'transparent'
+			});
+		
+			row.add(rowWeb);		
 		}
-		row.add(descriptionLabel);
 		//add our little icon to the left of the row 
 		var iconImage = Titanium.UI.createImageView({
 			image: 'img/eggpan.png',
