@@ -3,7 +3,6 @@
  */
 Ti.include('database.js');
 var detailWindow = Titanium.UI.currentWindow; 
-Ti.API.warn('show'+detailWindow._title+" "+detailWindow._description);
 	
 //add favorite Button
 var favButton = Titanium.UI.createButton({
@@ -14,6 +13,14 @@ var favButton = Titanium.UI.createButton({
 	top:10,
 	added: 0
 });
+
+if(isFavorite(detailWindow._title))
+{
+	Ti.API.warn(">>>>>>>>>>>>>>>>>>>>>>>>>>>> "+detailWindow._title+" is Favorite");
+
+	favButton.added = 1;
+	favButton.title = 'Remove Favorit';
+}
 	
 favButton.addEventListener('click',function(e){
 

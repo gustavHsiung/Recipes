@@ -21,3 +21,37 @@ function deleteFavorite(id){
 	var sql = "DELETE FROM favorites WHERE id = " + id;
 	db.execute(sql);
 }
+
+function getFavorites(){
+	var sql = "SELECT * FROM favorites ORDER BY title ASC";
+	var results= [];
+	var sqlReaultSet = db.execute(sql);
+	while(sqlReaultSet.isValidRow()){
+		results.push({
+			id:sqlReaultSet.fieldByName('id'),
+			title:sqlReaultSet.fieldByName('title'),
+			description:sqlReaultSet.fieldByName('description'),
+			link:sqlReaultSet.fieldByName('link')
+		});
+		sqlReaultSet.next();
+	}
+	
+	sqlReaultSet.close();
+	
+	return results;
+}
+
+function isFavorite(title){
+	
+	var sql = "SELECT * FROM favorites WHERE title = '" + title.replace("'","''")+"'";
+	var result= false;
+	var sqlReaultSet = db.execute(sql);
+	
+	while(sqlReaultSet.isValidRow()){
+		result = true;
+	}
+	
+	sqlReaultSet.close();
+	
+	return result;
+}
