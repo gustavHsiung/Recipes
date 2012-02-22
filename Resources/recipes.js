@@ -60,9 +60,9 @@ recipesHTTPClient.onload = function() {
 		
 		//create table row
 		var row = Titanium.UI.createTableViewRow({
-			title:aFeed.title.content,
-			description: aFeed.content.content,
-			link:aFeed.link.href,
+			_title:aFeed.title.content,
+			_description: aFeed.content.content,
+			_link:aFeed.link.href,
 			hasChild: true,
 			className: 'recipe-row',
 			filter: aFeed.title.content,
@@ -93,7 +93,7 @@ recipesHTTPClient.onload = function() {
 		
 		if(aFeed.content.content.length == 0) {
 			
-			row.description = 'No description is available.';
+			row._description = 'No description is available.';
 			descriptionLabel.height = 20;
 				
 		}else{
@@ -101,7 +101,7 @@ recipesHTTPClient.onload = function() {
 					
 		}
 		
-		descriptionLabel.text = row.description; 
+		descriptionLabel.text = row._description; 
 		row.add(descriptionLabel);
 		
 		row.height = titleLabel.height + descriptionLabel.height +15;
@@ -126,20 +126,19 @@ recipesTable.addEventListener('click', function(e){
 	
 	//get the selected row index
 	var selectedRow = e.rowData;
-	Ti.API.warn('Click'+e.index +e.rowData.title+" "+e.rowData.description);
+	Ti.API.warn('Click'+e.index +e.rowData._title+" "+e.rowData._description);
 	
 	// create detail window
 	var detailWindow = Titanium.UI.createWindow({
-		title:selectedRow.title,
-		description:selectedRow.description,
-		link:selectedRow.link,
+		_title:selectedRow._title,
+		_description:selectedRow._description,
+		_link:selectedRow._link,
 		backgroundColor:'#fff',
 		url: 'detail.js',
 		id:0
 	});
 	
-	detailWindow.open();
-	
+	Titanium.UI.currentTab.open(detailWindow);
 });
 	
 

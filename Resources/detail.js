@@ -3,21 +3,22 @@
  */
 Ti.include('database.js');
 var detailWindow = Titanium.UI.currentWindow; 
-
+Ti.API.warn('show'+detailWindow._title+" "+detailWindow._description);
+	
 //add favorite Button
 var favButton = Titanium.UI.createButton({
 	title: 'Add Favorit',
+	width: 140,
+	height:30,
 	left: 10,
 	top:10,
-	widht: 140,
-	height:30,
 	added: 0
 });
 	
 favButton.addEventListener('click',function(e){
 
 	if(favButton.added == 0){
-		var newId = insertFavorite(detailWindow.title,detailWindow.description,detailWindow.link);
+		var newId = insertFavorite(detailWindow._title,detailWindow._description,detailWindow._link);
 		Ti.API.info('Newly created favorite id = ' + newId);
 		detailWindow.id = newId;
 		alert('This recipe has been added as a favorite!');
@@ -26,7 +27,7 @@ favButton.addEventListener('click',function(e){
 
 	}else{
 		deleteFavorite(detailWindow.id);
-		Ti.API.info('Deleted ' + affectedRows +' favorite records. (id ' + detailWindow.id + ')');
+		Ti.API.info('Deleted favorite records. (id ' + detailWindow.id + ')');
 		detailWindow.id = 0;
 		alert('This recipe has been remove from  your favorites!');
 		favButton.added = 0;
@@ -40,16 +41,16 @@ detailWindow.add(favButton);
 	
 //open link button
 var viewLinkButton = Titanium.UI.createButton({
-	title: 'View InSafari',
-	right: 10,
-	top:10,
-	widht: 140,
-	height:30,
+	title: 'View in Browser',
+	right: 	10,
+	top:	10,
+	width: 	140,
+	height:	30,
 	added: 0
 });
 	
 viewLinkButton.addEventListener('click' ,function(e){
-	Ti.Platform.openURL(detailWindow.link);
+	Ti.Platform.openURL(detailWindow._link);
 });
 	
 detailWindow.add(viewLinkButton);
@@ -57,7 +58,7 @@ detailWindow.add(viewLinkButton);
 	
 //full descrition label
 var detailDescriptionLabel = Titanium.UI.createLabel({
-	text: detailWindow.description,
+	text: detailWindow._description,
 	font : {fontSize: 12, fontWeight : ' normal ' },
 	left: 	10,
 	top: 	50,
