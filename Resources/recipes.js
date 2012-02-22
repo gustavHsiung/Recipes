@@ -60,6 +60,9 @@ recipesHTTPClient.onload = function() {
 		
 		//create table row
 		var row = Titanium.UI.createTableViewRow({
+			title:aFeed.title.content,
+			description: aFeed.content.content,
+			link:aFeed.link.href,
 			hasChild: true,
 			className: 'recipe-row',
 			filter: aFeed.title.content,
@@ -90,15 +93,17 @@ recipesHTTPClient.onload = function() {
 		
 		if(aFeed.content.content.length == 0) {
 			
-			descriptionLabel.text = 'No description is available.'; 
+			row.description = 'No description is available.';
 			descriptionLabel.height = 20;
 				
 		}else{
-			descriptionLabel.text = aFeed.content.content;
 			descriptionLabel.height = 45;
 					
 		}
+		
+		descriptionLabel.text = row.description; 
 		row.add(descriptionLabel);
+		
 		row.height = titleLabel.height + descriptionLabel.height +15;
 		//add our little icon to the left of the row 
 		var iconImage = Titanium.UI.createImageView({
@@ -116,6 +121,29 @@ recipesHTTPClient.onload = function() {
 	recipesTable.data = data;
 };
 
+//tablerow selected function: create new window
+recipesTable.addEventListener('click', function(e){
+	
+	//get the selected row index
+	var selectedRow = e.rowData;
+	Ti.API.warn('Click'+e.index +e.rowData.title+" "+e.rowData.description);
+	
+	// create detail window
+	var detailWindow = Titanium.UI.createWindow({
+		title:selectedRow.title,
+		description:selectedRow.description,
+		link:selectedRow.link,
+		backgroundColor:'#fff',
+		url: 'detail.js',
+		id:0
+	});
+	
+	detailWindow.open();
+	
+});
+	
+
+
 //this method will fire if there's an error in accessing the //remote data
 recipesHTTPClient.onerror = function() {
 	// log the error to our Ti tanium Studio console
@@ -123,7 +151,7 @@ recipesHTTPClient.onerror = function() {
 }
 ;
 
-Ti.API.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>open");
+
 	
 //open the recipes xml feed
 recipesHTTPClient.open('GET' , 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20feed%20where%20url%3D\'http%3A%2F%2Fwww.foodandwine.com%2Ffeeds%2Flatest_recipes%3Fformat%3Datom\'&format=json&diagnostics=true');
