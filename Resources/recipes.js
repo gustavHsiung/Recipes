@@ -34,6 +34,44 @@ searchBar.addEventListener('cancel', function(e){
 });
 //end of search bar
 
+//create refresh view and relative variable
+var pulling = false;
+var reloading = false;
+
+var tableHeader = Titanium.UI.createView({
+	backgroundImage:'img/header.png',
+	width: 320,
+	height: 120
+})
+
+var arrowImage = Titanium.UI.createImageView({
+	backgroundImage:"img/refreshArrow.png",
+	width:22,
+	height:54,
+	bottom:20,
+	left:20
+})
+var statusLabel = Ti.UI.createLabel({ 
+	text:"Pull to refresh...",
+	left:85,
+	width:200,
+	bottom:28,
+	height:"auto",
+	color:"#FFF",
+	textAlign:"center",
+	font :{fontSize:14, fontWeight :"bold"},
+	shadowColor:"#89a",
+	shadowOffset:{x:0,y:1}
+});
+var actIndicator = Titanium.UI.createActivityIndicator({
+	left:20,
+	bottom:20,
+	width: 40,
+	height: 40
+});
+tableHeader.add(actIndicator);
+tableHeader.add(arrowImage);
+tableHeader.add(statusLabel);
 
 //create a table view
 var recipesTable = Titanium.UI.createTableView({
@@ -44,8 +82,61 @@ var recipesTable = Titanium.UI.createTableView({
 	search: searchBar,
 	filterAttribute:'filter'
 }); 
+recipesTable.headerPullView = tableHeader;
 win.add(recipesTable);
 
+//table scrolling function
+recipesTable.addEventListener('scroll', function(e){
+	
+	var offset = e.contentOffset.y;
+	if(offset < -80.0 && !pulling)
+	{
+		pulling = true;
+		arrowImage.backgroundImage = 'img/refreshArrow_up.png';
+		statusLabel.text = "Release to refresh...";
+	}else{
+		pulling = false;
+		arrowImage.backgroundImage = 'img/refreshArrow.png';
+		statusLabel.text = "Pull to refresh...";
+	}
+});
+recipesTable.addEventListener('scroll', function(e){
+	
+	var offset = e.contentOffset.y;
+	if(pulling && !reloading && e.contentOffset.y <= -80.0)
+	{
+		reloading = true;
+		pulling = false;
+		arrowImage.hide();
+		actIndicator.show();
+		statusLabel.text = "Reloading recipes...";
+		recipesTable.setContentInsets({top:80},{animated:true});
+		
+		//null out the existing recipe data
+		recipesTable.data = null;
+		data =[];
+		
+		loadRecipes();
+	}
+});
+//tablerow selected function: create new window
+recipesTable.addEventListener('click', function(e){
+	
+	//get the selected row index
+	var selectedRow = e.rowData;
+	
+	// create detail window
+	var detailWindow = Titanium.UI.createWindow({
+		_title:selectedRow._title,
+		_description:selectedRow._description,
+		_link:selectedRow._link,
+		backgroundColor:'#fff',
+		url: 'detail.js',
+		id:0
+	});
+	
+	Titanium.UI.currentTab.open(detailWindow);
+});
 // this method will process the remote data 
 recipesHTTPClient.onload = function() {
 	
@@ -119,45 +210,36 @@ recipesHTTPClient.onload = function() {
 	}
 	// set the data to tableview's data
 	recipesTable.data = data;
+	
+	if(reloading == true){
+		//when done, reset the header to its original style 
+		recipesTable.setContentInsets({top:0},{animated:true});
+		reloading = false;
+		statusLabel.text = "Pull to refresh...";
+		actIndicator.hide();
+		arrowImage.backgroundImage = 'img/refreshArrow.png';
+		arrowImage.show();
+	 }
 };
-
-//tablerow selected function: create new window
-recipesTable.addEventListener('click', function(e){
-	
-	//get the selected row index
-	var selectedRow = e.rowData;
-	Ti.API.warn('Click'+e.index +e.rowData._title+" "+e.rowData._description);
-	
-	// create detail window
-	var detailWindow = Titanium.UI.createWindow({
-		_title:selectedRow._title,
-		_description:selectedRow._description,
-		_link:selectedRow._link,
-		backgroundColor:'#fff',
-		url: 'detail.js',
-		id:0
-	});
-	
-	Titanium.UI.currentTab.open(detailWindow);
-});
-	
 
 
 //this method will fire if there's an error in accessing the //remote data
 recipesHTTPClient.onerror = function() {
 	// log the error to our Ti tanium Studio console
 	Ti.API.error(this.status + ' - ' + this.statusText);
+};
+
+loadRecipes();
+
+
+
+// function
+function loadRecipes(){	
+	//open the recipes xml feed
+	recipesHTTPClient.open('GET' , 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20feed%20where%20url%3D\'http%3A%2F%2Fwww.foodandwine.com%2Ffeeds%2Flatest_recipes%3Fformat%3Datom\'&format=json&diagnostics=true');
+	//execute the call to the remote feed 
+	recipesHTTPClient.send();
 }
-;
-
-
-	
-//open the recipes xml feed
-recipesHTTPClient.open('GET' , 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20feed%20where%20url%3D\'http%3A%2F%2Fwww.foodandwine.com%2Ffeeds%2Flatest_recipes%3Fformat%3Datom\'&format=json&diagnostics=true');
-//'http://rss.allrecipes.com/daily.aspx?hubID=80');
-//'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20feed%20where%20url%3D\'http%3A%2F%2Frss.allrecipes.com%2Fdaily.aspx%3FhubID%3D80\'&format=json&diagnostics=true&callback=cbfunc');//
-//execute the call to the remote feed 
-recipesHTTPClient.send();
 
 
 
