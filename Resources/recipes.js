@@ -87,6 +87,9 @@ win.add(recipesTable);
 
 //table scrolling function
 recipesTable.addEventListener('scroll', function(e){
+	if(Ti.Platform.osname != 'iPhone'){
+		return;
+	}
 	
 	var offset = e.contentOffset.y;
 	if(offset < -80.0 && !pulling)
@@ -101,7 +104,9 @@ recipesTable.addEventListener('scroll', function(e){
 	}
 });
 recipesTable.addEventListener('scroll', function(e){
-	
+	if(Ti.Platform.osname != 'iPhone'){
+		return;
+	}
 	var offset = e.contentOffset.y;
 	if(pulling && !reloading && e.contentOffset.y <= -80.0)
 	{
@@ -127,7 +132,7 @@ recipesTable.addEventListener('click', function(e){
 	
 	// create detail window
 	var detailWindow = Titanium.UI.createWindow({
-		_title:selectedRow._title,
+		_title:selectedRow._title, 
 		_description:selectedRow._description,
 		_link:selectedRow._link,
 		backgroundColor:'#fff',

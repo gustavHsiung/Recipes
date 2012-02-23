@@ -27,6 +27,7 @@ function getFavorites(){
 	var results= [];
 	var sqlReaultSet = db.execute(sql);
 	while(sqlReaultSet.isValidRow()){
+		
 		results.push({
 			id:sqlReaultSet.fieldByName('id'),
 			title:sqlReaultSet.fieldByName('title'),
@@ -47,7 +48,7 @@ function isFavorite(title){
 	var result= false;
 	var sqlReaultSet = db.execute(sql);
 	
-	while(sqlReaultSet.isValidRow()){
+	if(sqlReaultSet.isValidRow()){
 		result = true;
 	}
 	

@@ -38,10 +38,37 @@ var favoritesTable = Titanium.UI.createTableView({
 	search: searchBar,
 	filterAttribute:'filter'
 }); 
+//tablerow selected function: create new window
+favoritesTable.addEventListener('click', function(e){
+	
+	//get the selected row index
+	var selectedRow = e.rowData;
+	Ti.API.info(">>>>>>>>>>>>selectedRow.title "+selectedRow.title);
+	Ti.API.info(">>>>>>>>>>>>selectedRow.description "+selectedRow.description);
+	
+	// create detail window
+	var detailWindow = Titanium.UI.createWindow({
+		_title:selectedRow.title,
+		_description:selectedRow.description,
+		_link:selectedRow.link,
+		backgroundColor:'#fff',
+		url: 'detail.js',
+		id:0
+	});
+	
+	Titanium.UI.currentTab.open(detailWindow);
+});
+
 
 function loadFavorites(){
 	data = getFavorites();
 	if(data.length>0){
+		for(var i = 0; i<data.length; i++){
+			var sqlReaultSet = data[i];
+			Ti.API.warn(">>>>>>>>>>>>>>>>>>>>>>>>>>>> "+sqlReaultSet.id+":"+sqlReaultSet.title+", "
+		+sqlReaultSet.description+","+sqlReaultSet.link);
+
+		}
 		favoritesTable.data = data;
 		win.add(favoritesTable);
 
