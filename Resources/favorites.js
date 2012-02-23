@@ -60,9 +60,57 @@ favoritesTable.addEventListener('click', function(e){
 
 
 function loadFavorites(){
+	
 	data = getFavorites();
+	
 	if(data.length>0){
-		favoritesTable.data = data;
+		
+		var tableData = [];
+		//get through each item 
+		for(var i = 0; i < data.length; i++)
+		{
+			var aFavorite = data[i];
+		
+			//create table row
+			var row = Titanium.UI.createTableViewRow({
+				_title:aFavorite.title,
+				_description: aFavorite.description,
+				_link:aFavorite.link,
+				hasChild: true,
+				className: 'favorite-row',
+				filter: aFavorite.title,
+				height:70,
+				backgroundColor: '#fff'
+			});
+			//title label for row at index i
+			var titleLabel = Titanium.UI.createLabel({
+				text: aFavorite.title,
+				font : {fontSize: 14, fontWeight : ' bold' },
+				left: 70,
+				top: 10,
+				height: 50,
+				width: 210,
+				color:'#232'
+			});
+		
+			row.add(titleLabel);
+		
+		
+			//add our little icon to the left of the row 
+			var iconImage = Titanium.UI.createImageView({
+				image: 'img/eggpan.png',
+				width: 50,
+				height: 50,
+				left: 10,
+				top: 10 
+			});
+			
+			row.add(iconImage);
+			//add the row to data array
+			tableData.push(row);
+		}
+		// set the data to tableview's data
+		favoritesTable.data = tableData;
 		win.add(favoritesTable);
 
 	}else{

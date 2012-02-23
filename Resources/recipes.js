@@ -137,6 +137,7 @@ recipesTable.addEventListener('click', function(e){
 		_link:selectedRow._link,
 		backgroundColor:'#fff',
 		url: 'detail.js',
+		title:selectedRow._title,
 		id:0
 	});
 	
