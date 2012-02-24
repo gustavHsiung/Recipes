@@ -162,7 +162,14 @@ function loadFavorites(){
 			removeButton.hide();
 			row.add(removeButton);
 			
-			
+			if(Ti.Platform.osname != 'iphone'){
+				Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>enableSwipe ");
+	
+				enableSwipe	(row,false,10);	
+				row.addEventListener("swipe", function(e) { 
+					Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>swipe "+e.x);
+				});
+			}
 			//add the row to data array
 			tableData.push(row);
 		}
@@ -179,15 +186,6 @@ function loadFavorites(){
 //the focus event l istener wi l l ensure that the l ist / / is refreshed whenever the tab is changed
 win.addEventListener('focus', loadFavorites);
 
-if(Ti.Platform.osname != 'iphone'){
-				Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>enableSwipe ");
-	
-				enableSwipe	(win,false,10);	
-				win.addEventListener("swipe", function(e) { 
-					Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>swipe "+e.x);
-				});
-}
-			
 function removeFavoriteRow(rowIndex)
 {
 	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>> row "+rowIndex+" is going to be deleted.");
