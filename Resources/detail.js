@@ -16,8 +16,6 @@ var favButton = Titanium.UI.createButton({
 
 if(isFavorite(detailWindow._title))
 {
-	Ti.API.warn(">>>>>>>>>>>>>>>>>>>>>>>>>>>> "+detailWindow._title+" is Favorite");
-
 	favButton.added = 1;
 	favButton.title = 'Remove Favorit';
 }
@@ -48,7 +46,7 @@ detailWindow.add(favButton);
 	
 //open link button
 var viewLinkButton = Titanium.UI.createButton({
-	title: 'View in Browser',
+	title: 'View the webpage',
 	right: 	10,
 	top:	10,
 	width: 	140,
@@ -57,7 +55,17 @@ var viewLinkButton = Titanium.UI.createButton({
 });
 	
 viewLinkButton.addEventListener('click' ,function(e){
-	Ti.Platform.openURL(detailWindow._link);
+	Ti.Platform.openURL(">>>>>>>>>>>>>>>>>>>>>>>>>"+detailWindow._link);
+	// create detail window
+	var viewLinkWindow = Titanium.UI.createWindow({
+		_link:detailWindow._link,
+		backgroundColor:'#fff',
+		url: 'viewLink.js',
+		title:detailWindow._title,
+		id:0
+	});
+	
+	Titanium.UI.currentTab.open(viewLinkWindow);
 });
 	
 detailWindow.add(viewLinkButton);
