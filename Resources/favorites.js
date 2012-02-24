@@ -36,10 +36,13 @@ var favoritesTable = Titanium.UI.createTableView({
 	top: 	0,
 	left: 	0,
 	search: searchBar,
-	filterAttribute:'filter'
+	filterAttribute:'filter',
+	editable: true,
+	deleteButtonTitle: 'Remove'
 }); 
 //tablerow selected function: create new window
 favoritesTable.addEventListener('click', function(e){
+	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row ("+e.index+") was clicked");
 	
 	//get the selected row index
 	var theFavorite = data[e.index];
@@ -58,6 +61,26 @@ favoritesTable.addEventListener('click', function(e){
 	
 	Titanium.UI.currentTab.open(detailWindow);
 });
+//handel swipe to delete
+/*
+favoritesTable.addEventListener('swipe', function(e){
+	e.row.removeButton.show();	
+	e.row.removeButton.addEventListener('click',function(e){	
+		removeFavoriteRow(e.row.index);
+	});
+	favoritesTable.removeEventListener('click');
+	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row was swiped");
+});
+*/
+favoritesTable.addEventListener('delete', function(e){
+	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row ("+e.index+") was deleted");
+	var removedID = data[e.index].id;
+	
+	deleteFavorite(removedID);
+	Ti.API.info('>>>>>>>>>>>>>>>>>>>>>>Deleted favorite records. (id ' + removedID + ')');
+		
+});
+
 win.add(favoritesTable);
 favoritesTable.hide();		
 	
@@ -122,6 +145,23 @@ function loadFavorites(){
 			});
 			
 			row.add(iconImage);
+			
+			//remove button
+			var removeButton = Titanium.UI.createButton({
+				title: 'Remove',
+				right: 	10,
+				top:	20,
+				width: 	61,
+				height:	30,
+				font : {fontSize: 10, fontWeight : 'bold' },
+				color: '#fff',
+				shadowColor:"#121",
+				backgroundImage:"img/remove_normal.png",
+				backgroundSelectedImage:"img/remove_pressed.png"
+			});
+			removeButton.hide();
+			row.add(removeButton);
+			
 			//add the row to data array
 			tableData.push(row);
 		}
@@ -137,3 +177,10 @@ function loadFavorites(){
 }
 //the focus event l istener wi l l ensure that the l ist / / is refreshed whenever the tab is changed
 win.addEventListener('focus', loadFavorites);
+
+function removeFavoriteRow(rowIndex)
+{
+	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>> row "+rowIndex+" is going to be deleted.");
+	favoritesTable.deleteRow(rowIndex);
+	
+}
