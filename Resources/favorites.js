@@ -72,8 +72,8 @@ favoritesTable.addEventListener('swipe', function(e){
 	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row was swiped");
 });
 */
+
 favoritesTable.addEventListener('delete', function(e){
-	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row ("+e.index+") was deleted");
 	var removedID = data[e.index].id;
 	
 	deleteFavorite(removedID);
@@ -162,6 +162,7 @@ function loadFavorites(){
 			removeButton.hide();
 			row.add(removeButton);
 			
+			
 			//add the row to data array
 			tableData.push(row);
 		}
@@ -178,9 +179,79 @@ function loadFavorites(){
 //the focus event l istener wi l l ensure that the l ist / / is refreshed whenever the tab is changed
 win.addEventListener('focus', loadFavorites);
 
+if(Ti.Platform.osname != 'iphone'){
+				Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>enableSwipe ");
+	
+				enableSwipe	(win,false,10);	
+				win.addEventListener("swipe", function(e) { 
+					Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>swipe "+e.x);
+				});
+}
+			
 function removeFavoriteRow(rowIndex)
 {
 	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>> row "+rowIndex+" is going to be deleted.");
 	favoritesTable.deleteRow(rowIndex);
 	
+}
+function enableSwipe (view, allowVertical, tolerance) {
+ 
+ 	tolerance = tolerance || 2;
+ 
+    var start;
+ 
+    view.addEventListener('touchstart', function(evt) {
+ 		Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row ("+start+") touchend");
+	
+        start = evt;
+ 
+    });
+ 
+    view.addEventListener('touchend', function (end) {
+ 
+        var dx = end.x - start.x, dy = end.y - start.y;
+ 
+        var dist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+ 
+        // only trigger if dragged further than 50 pixels
+ 		Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row ("+dist+") touchend");
+	
+        if (dist < 50) {
+ 
+            return;
+ 
+        }
+ 
+        var isVertical = Math.abs(dx / dy) < 1 / tolerance;
+ 
+        var isHorizontal = Math.abs(dy / dx) < 1 / tolerance;
+ 
+        // only trigger if dragged in a particular direction
+ 
+        if (!isVertical && !isHorizontal) {
+ 
+            return;
+ 
+        }
+ 
+        // disallow vertical swipe, depending on the setting
+ 
+        if (!allowVertical && isVertical) {
+ 
+            return;
+ 
+        }
+ 
+        // now fire the event off so regular 'swipe' handlers can use this!
+ 
+        end.direction = isHorizontal ? ((dx < 0) ? 'left' : 'right') : ((dy < 0) ? 'up' : 'down');
+ 
+        end.type = 'swipe';
+ 
+        view.fireEvent('swipe', end);
+ 
+    });
+ 
+ 
+ 
 }
