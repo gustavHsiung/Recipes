@@ -87,7 +87,8 @@ win.add(recipesTable);
 
 //table scrolling function
 recipesTable.addEventListener('scroll', function(e){
-	if(Ti.Platform.osname != 'iPhone'){
+	if(Ti.Platform.osname != 'iphone'){
+		Titanium.API.info("Ti.Platform.osname != 'iPhone':"+Ti.Platform.osname);
 		return;
 	}
 	
@@ -104,7 +105,7 @@ recipesTable.addEventListener('scroll', function(e){
 	}
 });
 recipesTable.addEventListener('scroll', function(e){
-	if(Ti.Platform.osname != 'iPhone'){
+	if(Ti.Platform.osname != 'iphone'){
 		return;
 	}
 	var offset = e.contentOffset.y;
@@ -185,7 +186,7 @@ recipesHTTPClient.onload = function() {
 				left: 	70,
 				top: 	titleLabel.height+5,
 				width: 	200,
-				color:	'#9c9'
+				color:	'#9a9'
 		});
 		
 		if(aFeed.content.content.length == 0) {

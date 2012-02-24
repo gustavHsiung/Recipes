@@ -13,8 +13,14 @@ var favButton = Titanium.UI.createButton({
 	top:10,
 	added: 0
 });
-
-if(isFavorite(detailWindow._title))
+// check if this recipe is in favorites
+if(detailWindow.id<=0)
+{
+	detailWindow.id = isFavorite(detailWindow._title);
+	Ti.API.info('isFavorite? (' + detailWindow.id + ')');
+	
+}
+if(detailWindow.id>0)
 {
 	favButton.added = 1;
 	favButton.title = 'Remove Favorit';
@@ -55,7 +61,7 @@ var viewLinkButton = Titanium.UI.createButton({
 });
 	
 viewLinkButton.addEventListener('click' ,function(e){
-	Ti.Platform.openURL(">>>>>>>>>>>>>>>>>>>>>>>>>"+detailWindow._link);
+	
 	// create detail window
 	var viewLinkWindow = Titanium.UI.createWindow({
 		_link:detailWindow._link,
@@ -74,12 +80,12 @@ detailWindow.add(viewLinkButton);
 //full descrition label
 var detailDescriptionLabel = Titanium.UI.createLabel({
 	text: detailWindow._description,
-	font : {fontSize: 12, fontWeight : ' normal ' },
+	font : {fontSize: 13, fontWeight : ' normal ' },
 	left: 	10,
 	top: 	50,
 	width: 	300,
 	height: 'auto',
-	color:	'#9c9'
+	color:	'#9a9'
 });
 	
 detailWindow.add(detailDescriptionLabel);

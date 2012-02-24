@@ -46,6 +46,7 @@ favoritesTable.addEventListener('click', function(e){
 			
 	// create detail window
 	var detailWindow = Titanium.UI.createWindow({
+		id:theFavorite.id,
 		_title:theFavorite.title,
 		_description:theFavorite.description,
 		_link:theFavorite.link,
@@ -57,8 +58,23 @@ favoritesTable.addEventListener('click', function(e){
 	
 	Titanium.UI.currentTab.open(detailWindow);
 });
+win.add(favoritesTable);
+favoritesTable.hide();		
+	
+//no favorite label
+var noFavLabel = Titanium.UI.createLabel({
+	color:'#999',
+	text:'No Favorites yet.',
+	font:{fontSize:20,fontFamily:'Helvetica Neue'},
+	textAlign:'center',
+	height:40,
+	width:'auto',
+	top: 100,
 
-
+});
+win.add(noFavLabel);
+noFavLabel.hide();
+		
 function loadFavorites(){
 	
 	data = getFavorites();
@@ -98,7 +114,7 @@ function loadFavorites(){
 		
 			//add our little icon to the left of the row 
 			var iconImage = Titanium.UI.createImageView({
-				image: 'img/eggpan.png',
+				image: 'img/eggcooking.png',
 				width: 50,
 				height: 50,
 				left: 10,
@@ -111,19 +127,11 @@ function loadFavorites(){
 		}
 		// set the data to tableview's data
 		favoritesTable.data = tableData;
-		win.add(favoritesTable);
-
+		favoritesTable.show();
+		noFavLabel.hide();
 	}else{
-		var label2 = Titanium.UI.createLabel({
-			color:'#999',
-			text:'No Favorites yet.',
-			font:{fontSize:20,fontFamily:'Helvetica Neue'},
-			textAlign:'center',
-			width:'auto',
-			top: 100
-		});
-
-		win.add(label2);
+		favoritesTable.hide();
+		noFavLabel.show();
 	}
 	
 }

@@ -44,12 +44,12 @@ function getFavorites(){
 
 function isFavorite(title){
 	
-	var sql = "SELECT * FROM favorites WHERE title = '" + title.replace("'","''")+"'";
-	var result= false;
+	var sql = "SELECT id FROM favorites WHERE title = '" + title.replace("'","''")+"'";
+	var result= -1;
 	var sqlReaultSet = db.execute(sql);
 	
 	if(sqlReaultSet.isValidRow()){
-		result = true;
+		result = sqlReaultSet.fieldByName('id');
 	}
 	
 	sqlReaultSet.close();
