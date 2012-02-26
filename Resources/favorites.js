@@ -68,10 +68,10 @@ if(Ti.Platform.osname == 'android'){
 	
 	
  
-	enableSwipe	(favoritesTable,false,10);	
+	//enableSwipe	(favoritesTable,false,10);	
 				
 	favoritesTable.addEventListener('swipe', function(e){
-		Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row was swiped"+e.x+","+e.y);
+		Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row -"+ e.source.dataIndex +" was swiped"+e.x+","+e.y);
 	
 		/*e.row.removeButton.show();	
 		e.row.removeButton.addEventListener('click',function(e){	
@@ -139,16 +139,16 @@ function loadFavorites(){
 				height: 50,
 				width: 210,
 				color:'#232',
-				dataIndex:aFavorite.id
+				dataIndex:i
 			});
 
-			
+			Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row :"+ aFavorite.title+" id:"+aFavorite.id);
+	
  			if(Ti.Platform.osname != 'iphone'){
 				
 				enableSwipe	(titleLabel,false,10);	
-				/*titleLabel.addEventListener("swipe", function(e) { 
-					Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>swipe "+e.x);
-				});*/
+				titleLabel.addEventListener("swipe", showRemoveButton);
+				//titleLabel.addEventListener("click", enterDetailView);
 			} 
 			 
 			
@@ -224,14 +224,21 @@ function enableSwipe (view, allowVertical, tolerance) {
         var dist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
  
         // only trigger if dragged further than 50 pixels
- 		Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, swip ("+dist+") dist");
-	
+ 		
         if (dist < 50) {
- 
+ 			end.source = start.source;
+ 			Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, click at ("+end.source.dataIndex+") fire");
+			enterDetailView(end.source.dataIndex);
+			//view.fireEvent('click', end);
             return;
  
+        }else{
+        	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, swip ("+dist+") dist");
+	
+        	//view.removeEventListener('click',enterDetailView);
         }
- 
+ 		
+ 		
         var isVertical = Math.abs(dx / dy) < 1 / tolerance;
  
         var isHorizontal = Math.abs(dy / dx) < 1 / tolerance;
@@ -258,10 +265,37 @@ function enableSwipe (view, allowVertical, tolerance) {
  
         end.type = 'swipe';
  
+ 		end.source = start.source;
+ 		
         view.fireEvent('swipe', end);
- 
+ 			
     });
  
  
  
+}
+function showRemoveButton(e)
+{
+	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>show remove button for the row: "+ e.source.dataIndex );
+
+}
+function enterDetailView(dataIndex)
+{
+	//Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>go  a row: "+ e.source.rowIndex +" detail.");
+	var theFavorite = data[dataIndex];
+	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>go  a recipe: "+ theFavorite.title);
+			
+	// create detail window
+	var detailWindow = Titanium.UI.createWindow({
+		id:theFavorite.id,
+		_title:theFavorite.title,
+		_description:theFavorite.description,
+		_link:theFavorite.link,
+		backgroundColor:'#fff',
+		title:theFavorite.title,
+		url: 'detail.js',
+		id:0
+	});
+	
+	Titanium.UI.currentTab.open(detailWindow);
 }
