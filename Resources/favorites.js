@@ -41,6 +41,7 @@ var favoritesTable = Titanium.UI.createTableView({
 	deleteButtonTitle: 'Remove'
 }); 
 //tablerow selected function: create new window
+if(Ti.Platform.osname == 'iphone'){
 favoritesTable.addEventListener('click', function(e){
 	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row ("+e.index+") was clicked");
 	
@@ -61,17 +62,25 @@ favoritesTable.addEventListener('click', function(e){
 	
 	Titanium.UI.currentTab.open(detailWindow);
 });
+}
 //handel swipe to delete
-/*
-favoritesTable.addEventListener('swipe', function(e){
-	e.row.removeButton.show();	
-	e.row.removeButton.addEventListener('click',function(e){	
-		removeFavoriteRow(e.row.index);
+if(Ti.Platform.osname == 'android'){
+	
+	
+ 
+	enableSwipe	(favoritesTable,false,10);	
+				
+	favoritesTable.addEventListener('swipe', function(e){
+		Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row was swiped"+e.x+","+e.y);
+	
+		/*e.row.removeButton.show();	
+		e.row.removeButton.addEventListener('click',function(e){	
+			removeFavoriteRow(e.row.index);
+		});
+		favoritesTable.removeEventListener('click');
+		*/
 	});
-	favoritesTable.removeEventListener('click');
-	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row was swiped");
-});
-*/
+}
 
 favoritesTable.addEventListener('delete', function(e){
 	var removedID = data[e.index].id;
@@ -129,9 +138,20 @@ function loadFavorites(){
 				top: 10,
 				height: 50,
 				width: 210,
-				color:'#232'
+				color:'#232',
+				dataIndex:aFavorite.id
 			});
-		
+
+			
+ 			if(Ti.Platform.osname != 'iphone'){
+				
+				enableSwipe	(titleLabel,false,10);	
+				/*titleLabel.addEventListener("swipe", function(e) { 
+					Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>swipe "+e.x);
+				});*/
+			} 
+			 
+			
 			row.add(titleLabel);
 		
 		
@@ -162,14 +182,7 @@ function loadFavorites(){
 			removeButton.hide();
 			row.add(removeButton);
 			
-			if(Ti.Platform.osname != 'iphone'){
-				Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>enableSwipe ");
-	
-				enableSwipe	(row,false,10);	
-				row.addEventListener("swipe", function(e) { 
-					Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>swipe "+e.x);
-				});
-			}
+			
 			//add the row to data array
 			tableData.push(row);
 		}
@@ -193,15 +206,14 @@ function removeFavoriteRow(rowIndex)
 	
 }
 function enableSwipe (view, allowVertical, tolerance) {
- 
+ 	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>enableSwipe ");
+	
  	tolerance = tolerance || 2;
  
     var start;
  
     view.addEventListener('touchstart', function(evt) {
- 		Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row ("+start+") touchend");
-	
-        start = evt;
+ 		start = evt;
  
     });
  
@@ -212,7 +224,7 @@ function enableSwipe (view, allowVertical, tolerance) {
         var dist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
  
         // only trigger if dragged further than 50 pixels
- 		Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row ("+dist+") touchend");
+ 		Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, swip ("+dist+") dist");
 	
         if (dist < 50) {
  

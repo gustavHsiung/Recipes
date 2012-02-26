@@ -1,6 +1,13 @@
 // this sets the background color of the master UIView (when there are no windows/tab groups on it)
 Titanium.UI.setBackgroundColor('#FFF');
 
+
+	
+Ti.App.addEventListener('pause', function() {
+    Ti.API.info('App Paused');
+    
+});
+
 // create tab group
 var tabGroup = Titanium.UI.createTabGroup();
 
@@ -19,7 +26,14 @@ var win1 = Titanium.UI.createWindow({
   	backgroundImage: 'background.png',
   	url: 'recipes.js',
   	title: 'Recipes',
-  	barImage: 'navbar.png'
+  	barImage: 'navbar.png',
+  	exitOnClose:true
+});
+
+win1.addEventListener('android:back', function(){
+   var activity = Titanium.Android.currentActivity;
+   Ti.API.info('>>>>>>>>>>>>>>>>>>>>>>>>> android '+activity);
+   activity.finish();
 });
 
 var tab1 = Titanium.UI.createTab({  
