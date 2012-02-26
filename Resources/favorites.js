@@ -63,24 +63,7 @@ favoritesTable.addEventListener('click', function(e){
 	Titanium.UI.currentTab.open(detailWindow);
 });
 }
-//handel swipe to delete
-if(Ti.Platform.osname == 'android'){
-	
-	
- 
-	//enableSwipe	(favoritesTable,false,10);	
-				
-	favoritesTable.addEventListener('swipe', function(e){
-		Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row -"+ e.source.dataIndex +" was swiped"+e.x+","+e.y);
-	
-		/*e.row.removeButton.show();	
-		e.row.removeButton.addEventListener('click',function(e){	
-			removeFavoriteRow(e.row.index);
-		});
-		favoritesTable.removeEventListener('click');
-		*/
-	});
-}
+
 
 favoritesTable.addEventListener('delete', function(e){
 	var removedID = data[e.index].id;
@@ -165,23 +148,6 @@ function loadFavorites(){
 			});
 			
 			row.add(iconImage);
-			
-			//remove button
-			var removeButton = Titanium.UI.createButton({
-				title: 'Remove',
-				right: 	10,
-				top:	20,
-				width: 	61,
-				height:	30,
-				font : {fontSize: 10, fontWeight : 'bold' },
-				color: '#fff',
-				shadowColor:"#121",
-				backgroundImage:"img/remove_normal.png",
-				backgroundSelectedImage:"img/remove_pressed.png"
-			});
-			removeButton.hide();
-			row.add(removeButton);
-			
 			
 			//add the row to data array
 			tableData.push(row);
@@ -277,7 +243,72 @@ function enableSwipe (view, allowVertical, tolerance) {
 function showRemoveButton(e)
 {
 	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>show remove button for the row: "+ e.source.dataIndex );
+	
+	var aFavorite = data[e.source.dataIndex ];
+		
+			//create table row
+			var row = Titanium.UI.createTableViewRow({
+				_title:aFavorite.title,
+				_description: aFavorite.description,
+				_link:aFavorite.link,
+				hasChild: false,
+				className: 'favorite-row',
+				filter: aFavorite.title,
+				height:70,
+				backgroundColor: '#fff'
+			});
+			//title label for row at index i
+			var titleLabel = Titanium.UI.createLabel({
+				text: aFavorite.title,
+				font : {fontSize: 14, fontWeight : ' bold' },
+				left: 70,
+				top: 10,
+				height: 50,
+				width: 160,
+				color:'#232',
+				dataIndex:e.source.dataIndex
+			});
 
+			Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row :"+ aFavorite.title+" id:"+aFavorite.id);
+	
+ 			if(Ti.Platform.osname != 'iphone'){
+				
+				enableSwipe	(titleLabel,false,10);	
+				titleLabel.addEventListener("swipe", showRemoveButton);
+				//titleLabel.addEventListener("click", enterDetailView);
+			} 
+			 
+			
+			row.add(titleLabel);
+		
+		
+			//add our little icon to the left of the row 
+			var iconImage = Titanium.UI.createImageView({
+				image: 'img/eggcooking.png',
+				width: 50,
+				height: 50,
+				left: 10,
+				top: 10 
+			});
+			
+			row.add(iconImage);
+			
+			//remove button
+			var removeButton = Titanium.UI.createButton({
+				title: 'Remove',
+				right: 	10,
+				top:	20,
+				width: 	61,
+				height:	30,
+				font : {fontSize: 10, fontWeight : 'bold' },
+				color: '#fff',
+				shadowColor:"#121",
+				backgroundImage:"img/remove_normal.png",
+				backgroundSelectedImage:"img/remove_pressed.png"
+			});
+			removeButton.show();
+			row.add(removeButton);
+		favoritesTable.updateRow(e.source.dataIndex,row,true);
 }
 function enterDetailView(dataIndex)
 {
