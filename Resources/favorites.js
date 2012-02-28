@@ -179,7 +179,13 @@ function removeAlertClick(e)
 	{
 		return;
 	}else{
-		removeFavoriteRow(e.source.rowIndex);
+		var deletingIndex = e.source.rowIndex;
+		removeFavoriteRow(deletingIndex);
+		var removedID = data[deletingIndex].id;
+	
+		deleteFavorite(removedID);
+		Ti.API.info('>>>>>>>>>>>>>>>>>>>>>>Deleted favorite records. (id ' + removedID + ')');
+
 	}
 	
 }
