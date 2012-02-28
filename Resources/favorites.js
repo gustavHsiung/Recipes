@@ -41,28 +41,12 @@ var favoritesTable = Titanium.UI.createTableView({
 	deleteButtonTitle: 'Remove'
 }); 
 //tablerow selected function: create new window
-if(Ti.Platform.osname == 'iphone'){
 favoritesTable.addEventListener('click', function(e){
-	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row ("+e.index+") was clicked");
-	
 	//get the selected row index
-	var theFavorite = data[e.index];
-			
-	// create detail window
-	var detailWindow = Titanium.UI.createWindow({
-		id:theFavorite.id,
-		_title:theFavorite.title,
-		_description:theFavorite.description,
-		_link:theFavorite.link,
-		backgroundColor:'#fff',
-		title:theFavorite.title,
-		url: 'detail.js',
-		id:0
-	});
-	
-	Titanium.UI.currentTab.open(detailWindow);
+	var theFavoriteIndex = e.index;
+	enterDetailView(theFavoriteIndex);
 });
-}
+
 
 
 favoritesTable.addEventListener('delete', function(e){
@@ -104,6 +88,7 @@ function loadFavorites(){
 		
 			//create table row
 			var row = Titanium.UI.createTableViewRow({
+				dataIndex:i,
 				_title:aFavorite.title,
 				_description: aFavorite.description,
 				_link:aFavorite.link,
@@ -111,7 +96,8 @@ function loadFavorites(){
 				className: 'favorite-row',
 				filter: aFavorite.title,
 				height:70,
-				backgroundColor: '#fff'
+				backgroundColor: '#fff',
+				
 			});
 			//title label for row at index i
 			var titleLabel = Titanium.UI.createLabel({
@@ -125,18 +111,7 @@ function loadFavorites(){
 				dataIndex:i
 			});
 
-			Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row :"+ aFavorite.title+" id:"+aFavorite.id);
-	
- 			if(Ti.Platform.osname != 'iphone'){
-				
-				enableSwipe	(titleLabel,false,10);	
-				titleLabel.addEventListener("swipe", showRemoveButton);
-				//titleLabel.addEventListener("click", enterDetailView);
-			} 
-			 
-			
 			row.add(titleLabel);
-		
 		
 			//add our little icon to the left of the row 
 			var iconImage = Titanium.UI.createImageView({
@@ -149,6 +124,19 @@ function loadFavorites(){
 			
 			row.add(iconImage);
 			
+			//when app is running on Android platform, show 
+			//remove favorite alert when longClick event is triggered 
+			if(Ti.Platform.osname == 'android'){
+				row.addEventListener('longclick', function(e){
+					Ti.API.info(e.source);
+					
+					//get the selected row index
+					var theFavoriteIndex = e.source.dataIndex;
+					showRemoveAlert(theFavoriteIndex);
+					
+				});
+			}
+
 			//add the row to data array
 			tableData.push(row);
 		}
@@ -171,144 +159,29 @@ function removeFavoriteRow(rowIndex)
 	favoritesTable.deleteRow(rowIndex);
 	
 }
-function enableSwipe (view, allowVertical, tolerance) {
- 	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>enableSwipe ");
-	
- 	tolerance = tolerance || 2;
- 
-    var start;
- 
-    view.addEventListener('touchstart', function(evt) {
- 		start = evt;
- 
-    });
- 
-    view.addEventListener('touchend', function (end) {
- 
-        var dx = end.x - start.x, dy = end.y - start.y;
- 
-        var dist = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
- 
-        // only trigger if dragged further than 50 pixels
- 		
-        if (dist < 50) {
- 			end.source = start.source;
- 			Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, click at ("+end.source.dataIndex+") fire");
-			enterDetailView(end.source.dataIndex);
-			//view.fireEvent('click', end);
-            return;
- 
-        }else{
-        	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, swip ("+dist+") dist");
-	
-        	//view.removeEventListener('click',enterDetailView);
-        }
- 		
- 		
-        var isVertical = Math.abs(dx / dy) < 1 / tolerance;
- 
-        var isHorizontal = Math.abs(dy / dx) < 1 / tolerance;
- 
-        // only trigger if dragged in a particular direction
- 
-        if (!isVertical && !isHorizontal) {
- 
-            return;
- 
-        }
- 
-        // disallow vertical swipe, depending on the setting
- 
-        if (!allowVertical && isVertical) {
- 
-            return;
- 
-        }
- 
-        // now fire the event off so regular 'swipe' handlers can use this!
- 
-        end.direction = isHorizontal ? ((dx < 0) ? 'left' : 'right') : ((dy < 0) ? 'up' : 'down');
- 
-        end.type = 'swipe';
- 
- 		end.source = start.source;
- 		
-        view.fireEvent('swipe', end);
- 			
-    });
- 
- 
- 
-}
-function showRemoveButton(e)
+function showRemoveAlert(theFavoriteIndex)
 {
-	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>show remove button for the row: "+ e.source.dataIndex );
+	var aFavorite = data[theFavoriteIndex];
+	var alertDialog = Titanium.UI.createAlertDialog({
+		rowIndex:theFavoriteIndex,
+    	title: 'Remove',
+    	message: 'Do you want to remove recipe:\"'+aFavorite.title+'\" from your favories ?',
+    	buttonNames: ['OK','Doh!']
+	});
+	alertDialog.addEventListener('click',removeAlertClick);
+	alertDialog.show();
+}
+function removeAlertClick(e)
+{
+	Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>user click: "+ e.index );
 	
-	var aFavorite = data[e.source.dataIndex ];
-		
-			//create table row
-			var row = Titanium.UI.createTableViewRow({
-				_title:aFavorite.title,
-				_description: aFavorite.description,
-				_link:aFavorite.link,
-				hasChild: false,
-				className: 'favorite-row',
-				filter: aFavorite.title,
-				height:70,
-				backgroundColor: '#fff'
-			});
-			//title label for row at index i
-			var titleLabel = Titanium.UI.createLabel({
-				text: aFavorite.title,
-				font : {fontSize: 14, fontWeight : ' bold' },
-				left: 70,
-				top: 10,
-				height: 50,
-				width: 160,
-				color:'#232',
-				dataIndex:e.source.dataIndex
-			});
-
-			Titanium.API.info(">>>>>>>>>>>>>>>>>>>>>>huzzah, a row :"+ aFavorite.title+" id:"+aFavorite.id);
+	if(e.cancel || e.index == 1)
+	{
+		return;
+	}else{
+		removeFavoriteRow(e.source.rowIndex);
+	}
 	
- 			if(Ti.Platform.osname != 'iphone'){
-				
-				enableSwipe	(titleLabel,false,10);	
-				titleLabel.addEventListener("swipe", showRemoveButton);
-				//titleLabel.addEventListener("click", enterDetailView);
-			} 
-			 
-			
-			row.add(titleLabel);
-		
-		
-			//add our little icon to the left of the row 
-			var iconImage = Titanium.UI.createImageView({
-				image: 'img/eggcooking.png',
-				width: 50,
-				height: 50,
-				left: 10,
-				top: 10 
-			});
-			
-			row.add(iconImage);
-			
-			//remove button
-			var removeButton = Titanium.UI.createButton({
-				title: 'Remove',
-				right: 	10,
-				top:	20,
-				width: 	61,
-				height:	30,
-				font : {fontSize: 10, fontWeight : 'bold' },
-				color: '#fff',
-				shadowColor:"#121",
-				backgroundImage:"img/remove_normal.png",
-				backgroundSelectedImage:"img/remove_pressed.png"
-			});
-			removeButton.show();
-			row.add(removeButton);
-		favoritesTable.updateRow(e.source.dataIndex,row,true);
 }
 function enterDetailView(dataIndex)
 {
